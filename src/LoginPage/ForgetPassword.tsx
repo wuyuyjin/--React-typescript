@@ -1,24 +1,59 @@
-import {useForm} from 'react-hook-form'
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import * as zod from "zod"
 import {
-    FormErrorMessage,
-    FormLabel,
+    Button,
+    Card,
+    CardBody, CardFooter,
+    CardHeader,
+    Center,
     FormControl,
-    Input,
-    Button, Card, CardHeader, Heading, CardBody, CardFooter, Link, Center, HStack,
-} from '@chakra-ui/react'
+    FormLabel,
+    Heading, HStack,
+    Input, Link,
+    Text
+} from "@chakra-ui/react";
+import ky from "ky";
+import api from "../API/API";
+
+interface FormData {
+    userId: string,
+    password: string,
+    newPassword: string,
+    code: string
+}
+
+const userInfo = zod.object({
+    userId: zod.string().email({message: '请填入email'}),
+    password: zod.string().min(6, "至少需要六位密码哦！").max(15, "密码长度太长了！"),
+    newPassword: zod.string().min(6, "至少需要六位密码哦！").max(15, "密码长度太长了！"),
+    code: zod.string().length(6, "需要六位验证码！")
+}).refine((FormData) => FormData.password === FormData.newPassword, {
+    path: ["newPassword"],
+    message: "两次的密码不一致哦！"
+})
+
 
 const ForgetPassword = () => {
+    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
+        resolver: zodResolver(userInfo)
+    });
 
-    const {
-        handleSubmit,
-        register,
-        formState: {errors, isSubmitting},
-    } = useForm()
+    const onSubmit = (data: FormData) => {
+        const json = ky.get(api+'User/register',
+            {
+                json: {
+                    userId: data.userId,
+                    code: '1111',
+                    newPassword: data.newPassword
+                },
 
-    const onSubmit = (values) => {
-        return new Promise((resolve) => {
+            }).json();
+
+        console.log(json)
+
+        return new Promise<void>((resolve) => {
             setTimeout(() => {
-                alert(JSON.stringify(values, null, 2))
                 resolve()
             }, 3000)
         })
@@ -27,67 +62,44 @@ const ForgetPassword = () => {
 
     return (
         <Center>
-            <Card h={500} w={400} mt={36} textAlign='center'>
-                <CardHeader>
-                    <Heading size='md'>TalkSpace注册</Heading>
+            <Card h={600} w={400} mt={16}>
+                <CardHeader textAlign="center">
+                    <Heading size="md">忘记密码？</Heading>
                 </CardHeader>
                 <CardBody>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <FormControl isInvalid={errors.email}>
-                            <FormLabel htmlFor='email'>email</FormLabel>
-                            <Input
-                                id='email'
-                                placeholder='email'
-                                type='email'
-                                {...register('email', {
-                                    required: '请输入正确的Email',
-                                    minLength: {value: 4, message: 'Email'},
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.email && errors.email.message}
-                            </FormErrorMessage>
+                        <FormControl>
+                            <FormLabel>Email</FormLabel>
+                            <Input {...register("userId")} type="email" placeholder="请输入Email"/>
+                            <Text fontSize="xs" color="tomato">{errors.userId?.message}</Text>
                         </FormControl>
-                        <FormControl isInvalid={errors.password}>
-                            <FormLabel htmlFor='password'>password</FormLabel>
-                            <Input
-                                id='password'
-                                placeholder='password'
-                                type='password'
-                                {...register('password', {
-                                    required: '请输入密码',
-                                    minLength: {value: 6, message: '密码需要输入6位'},
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.password && errors.password.message}
-                            </FormErrorMessage>
+                        <FormControl>
+                            <FormLabel>新密码</FormLabel>
+                            <Input {...register("password")} type="password" placeholder="请输入密码"/>
+                            <Text fontSize="xs" color="tomato">{errors.password?.message}</Text>
                         </FormControl>
-                        <FormControl isInvalid={errors.newPassword}>
-                            <FormLabel htmlFor='newPassword'>newPassword</FormLabel>
-                            <Input
-                                id='newPassword'
-                                placeholder='newPassword'
-                                type='password'
-                                {...register('newPassword', {
-                                    required: '请确认密码',
-                                    minLength: {value: 6, message: '密码需要输入6位'},
-                                })}
-                            />
-
-                            {/* <FormErrorMessage>
-                                {errors.password && errors.password.message}
-                            </FormErrorMessage> */}
+                        <FormControl>
+                            <FormLabel>重复密码</FormLabel>
+                            <Input {...register("newPassword")} type="password" placeholder="请重复输入密码"/>
+                            <Text fontSize="xs" color="tomato">{errors.newPassword?.message}</Text>
                         </FormControl>
-                        <Button mt={4} colorScheme='teal' isLoading={isSubmitting} type='submit' marginTop={12}>
-                            Submit
-                        </Button>
+                        {/*<FormControl>*/}
+                        {/*    <FormLabel>验证码</FormLabel>*/}
+                        {/*    <HStack spacing={12}>*/}
+                        {/*        <Input {...register("code")} w={40} placeholder="请输入六位验证码" />*/}
+                        {/*        <Button type="submit" colorScheme='teal'>发送验证码</Button>*/}
+                        {/*    </HStack>*/}
+                        {/*    <Text fontSize="xs" color="tomato">{errors.code?.message}</Text>*/}
+                        {/*</FormControl>*/}
+                        <FormControl textAlign="center" mt={12} colorScheme='teal'>
+                            <Button type="submit" colorScheme='teal'>找回密码</Button>
+                        </FormControl>
                     </form>
                 </CardBody>
                 <CardFooter>
-                    <HStack spacing={30}>
-                        <Link>登录</Link>
-                        <Link>忘记密码？</Link>
+                    <HStack spacing={72}>
+                        <Link color='teal.500' href='#'>登录</Link>
+                        <Link color='teal.500' href='/'>注册</Link>
                     </HStack>
                 </CardFooter>
             </Card>
