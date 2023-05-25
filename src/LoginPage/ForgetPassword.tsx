@@ -8,10 +8,9 @@ import {
     CardHeader,
     Center,
     FormControl,
-    FormLabel,
     Heading, HStack,
     Input, Link,
-    Text
+    Text, VStack
 } from "@chakra-ui/react";
 import ky from "ky";
 import api from "../API/API";
@@ -34,6 +33,7 @@ const userInfo = zod.object({
 })
 
 
+
 const ForgetPassword = () => {
     const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
         resolver: zodResolver(userInfo)
@@ -47,7 +47,6 @@ const ForgetPassword = () => {
                     code: '1111',
                     newPassword: data.newPassword
                 },
-
             }).json();
 
         console.log(json)
@@ -68,38 +67,29 @@ const ForgetPassword = () => {
                 </CardHeader>
                 <CardBody>
                     <form onSubmit={handleSubmit(onSubmit)}>
+                        <VStack spacing={8}>
                         <FormControl>
-                            <FormLabel>Email</FormLabel>
                             <Input {...register("userId")} type="email" placeholder="请输入Email"/>
                             <Text fontSize="xs" color="tomato">{errors.userId?.message}</Text>
                         </FormControl>
                         <FormControl>
-                            <FormLabel>新密码</FormLabel>
                             <Input {...register("password")} type="password" placeholder="请输入密码"/>
                             <Text fontSize="xs" color="tomato">{errors.password?.message}</Text>
                         </FormControl>
                         <FormControl>
-                            <FormLabel>重复密码</FormLabel>
                             <Input {...register("newPassword")} type="password" placeholder="请重复输入密码"/>
                             <Text fontSize="xs" color="tomato">{errors.newPassword?.message}</Text>
                         </FormControl>
-                        {/*<FormControl>*/}
-                        {/*    <FormLabel>验证码</FormLabel>*/}
-                        {/*    <HStack spacing={12}>*/}
-                        {/*        <Input {...register("code")} w={40} placeholder="请输入六位验证码" />*/}
-                        {/*        <Button type="submit" colorScheme='teal'>发送验证码</Button>*/}
-                        {/*    </HStack>*/}
-                        {/*    <Text fontSize="xs" color="tomato">{errors.code?.message}</Text>*/}
-                        {/*</FormControl>*/}
                         <FormControl textAlign="center" mt={12} colorScheme='teal'>
                             <Button type="submit" colorScheme='teal'>找回密码</Button>
                         </FormControl>
+                        </VStack>
                     </form>
                 </CardBody>
                 <CardFooter>
                     <HStack spacing={72}>
-                        <Link color='teal.500' href='#'>登录</Link>
-                        <Link color='teal.500' href='/'>注册</Link>
+                        <Link color='teal.500' href='/'>登录</Link>
+                        <Link color='teal.500' href='/Register'>注册</Link>
                     </HStack>
                 </CardFooter>
             </Card>
