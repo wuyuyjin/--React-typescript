@@ -10,14 +10,12 @@ import {
     Center,
     FormControl,
     Heading, HStack,
-    Input, Link,
+    Input,
     Text, VStack
 } from "@chakra-ui/react";
-import api from "../API/API";
-import ky from "ky";
-// import useSWR, {mutate, useSWRConfig} from "swr";
-// import useSWRMutation from "swr/mutation";
-// import useSWR from "swr";
+// import api from "../API/API";
+// import ky from "ky";
+import {Link, useNavigate} from "react-router-dom";
 
 interface FormData {
     userId: string,
@@ -39,42 +37,34 @@ const userInfo = zod.object({
     message: "两次的密码不一致哦！"
 })
 
-
-// const Profile = () => {
-//
-//     const { data, error, mutate } = useSWR(api + "User/register", fetcher);
-//
-//     if (error) return <div>failed to load</div>;
-//     if (!data) return <div>loading...</div>;
-//
-//     return <div>hello {data.name}!</div>;
-// }
-
-
 const Register = () => {
+
+    const navigate = useNavigate()
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<FormData>({
         resolver: zodResolver(userInfo)
     });
 
-    const onSubmit = async (data: FormData) => {
-        try {
-           const json = await ky.post(api + "User/register", {
-                json: {
-                    userName: data.userName,
-                    password: data.password,
-                    userId: data.userId,
-                    code: '111111',
-                    role: data.role,
-                }
-            }).json();
-                console.log(data)
-            // mutate(data1)
-            console.log(json)
-        } catch (error) {
-            console.error(error);
-        }
-    }
 
+    const onSubmit = async (data: FormData) => {
+        // try {
+        //     const json = await ky.post(api + "User/register", {
+        //         json: {
+        //             userName: data.userName,
+        //             password: data.password,
+        //             userId: data.userId,
+        //             code: '111111',
+        //             role: data.role,
+        //         }
+        //     }).json();
+        //     console.log(data)
+        //     // mutate(data1)
+        //     console.log(json)
+        // } catch (error) {
+        //     console.error(error);
+        // }
+        navigate('/')
+        console.log(data)
+    }
 
     return (
         <Center>
@@ -117,8 +107,12 @@ const Register = () => {
                 </CardBody>
                 <CardFooter>
                     <HStack spacing={60}>
-                        <Link color='teal.500' href='/'>登录</Link>
-                        <Link color='teal.500' href='/ForgetPassword'>忘记密码？</Link>
+                        <Text color='teal.500'>
+                            <Link to='/'>登录</Link>
+                        </Text>
+                        <Text color='teal.500'>
+                            <Link to='/forgetPassword'>忘记密码？</Link>
+                        </Text>
                     </HStack>
                 </CardFooter>
             </Card>

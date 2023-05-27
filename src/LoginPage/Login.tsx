@@ -9,7 +9,6 @@ import {
     HStack,
     Heading,
     Input,
-    Link,
     Text,
     VStack,
 } from '@chakra-ui/react';
@@ -18,6 +17,7 @@ import ky from 'ky';
 import {useForm} from 'react-hook-form';
 import * as zod from 'zod';
 import api from "../API/API";
+import {Link} from "react-router-dom";
 
 interface IFormInputs {
     userId: string;
@@ -29,7 +29,7 @@ const userInfo = zod.object({
     password: zod.string().min(6, '密码需要输入6位').max(15, '密码最长15位'),
 });
 
-export default function Login() {
+const Login = () => {
     const {
         register,
         handleSubmit,
@@ -38,8 +38,8 @@ export default function Login() {
         resolver: zodResolver(userInfo),
     });
 
-    const onSubmit = (data: IFormInputs) => {
-        const json = ky
+    const onSubmit = async (data: IFormInputs) => {
+        const json = await ky
             .post(api + 'User/login', {
                 json: {
                     password: data.password,
@@ -54,14 +54,14 @@ export default function Login() {
         <Center>
             <Card h={450} w={400} mt={36}>
                 <CardHeader textAlign="center">
-                    <Heading size="md"> TalkSpace登录 </Heading>
+                    <Heading size="md">TalkSpace登录</Heading>
                 </CardHeader>
                 <CardBody>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <VStack spacing={4}>
                             <FormControl>
                                 <Input
-                                    {...register('userId', {required: 'Email is required'})}
+                                    {...register('userId')}
                                     placeholder="email"
                                     type="email"
                                 />
@@ -70,7 +70,7 @@ export default function Login() {
                                 </Text>
                             </FormControl>
                             <FormControl>
-                                <Input {...register('password')} placeholder="password" type="password" />
+                                <Input {...register('password')} placeholder="密码" type="password"/>
                                 <Text fontSize="xs" color="tomato">
                                     {errors.password?.message}
                                 </Text>
@@ -85,11 +85,17 @@ export default function Login() {
                 </CardBody>
                 <CardFooter>
                     <HStack spacing={60}>
-                        <Link color="teal.500" href="/Register">注册</Link>
-                        <Link color="teal.500" href="/ForgetPassword">忘记密码？</Link>
+                        <Text color='teal.500'>
+                            <Link to="/register">注册</Link>
+                        </Text>
+                        <Text color='teal.500'>
+                            <Link to="/forgetPassword">忘记密码？</Link>
+                        </Text>
                     </HStack>
                 </CardFooter>
             </Card>
         </Center>
     );
 }
+
+export default Login

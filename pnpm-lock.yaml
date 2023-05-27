@@ -10,6 +10,9 @@ dependencies:
   '@emotion/styled':
     specifier: ^11.11.0
     version: 11.11.0(@emotion/react@11.11.0)(@types/react@18.0.28)(react@18.2.0)
+  '@formkit/auto-animate':
+    specifier: 1.0.0-beta.6
+    version: 1.0.0-beta.6
   '@hookform/error-message':
     specifier: ^2.0.1
     version: 2.0.1(react-dom@18.2.0)(react-hook-form@7.43.9)(react@18.2.0)
@@ -1598,6 +1601,10 @@ packages:
     resolution: {integrity: sha512-IoD2MfUnOV58ghIHCiil01PcohxjbYR/qCxsoC+xNgUwh1EY8jOOrYmu3d3a71+tJJ23uscEV4X2HJWMsPJu4g==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
+
+  /@formkit/auto-animate@1.0.0-beta.6:
+    resolution: {integrity: sha512-PVDhLAlr+B4Xb7e+1wozBUWmXa6BFU8xUPR/W/E+TsQhPS1qkAdAsJ25keEnFrcePSnXHrOsh3tiFbEToOzV9w==}
+    dev: false
 
   /@hookform/error-message@2.0.1(react-dom@18.2.0)(react-hook-form@7.43.9)(react@18.2.0):
     resolution: {integrity: sha512-U410sAr92xgxT1idlu9WWOVjndxLdgPUHEB8Schr27C9eh7/xUnITWpCMF93s+lGiG++D4JnbSnrb5A21AdSNg==}
