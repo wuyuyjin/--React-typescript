@@ -1,98 +1,137 @@
-import {useForm} from 'react-hook-form'
 import {
-    FormErrorMessage,
-    FormLabel,
-    FormControl,
-    Input,
-    Button, Card, CardHeader, Heading, CardBody, CardFooter, Link, Center, HStack,
-} from '@chakra-ui/react'
+  Box,
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Center,
+  FormControl,
+  Heading,
+  HStack,
+  Input,
+  Link,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import ky from 'ky';
+import { useForm } from 'react-hook-form';
+
+import * as zod from 'zod';
+import api from '../API';
+// import useSWR, {mutate, useSWRConfig} from "swr";
+// import useSWRMutation from "swr/mutation";
+// import useSWR from "swr";
+
+type FormData = zod.infer<typeof userInfo>;
+const userInfo = zod
+  .object({
+    userId: zod.string().email({ message: '请填入email' }),
+    password: zod.string().min(6, '至少需要六位密码哦！').max(15, '密码长度太长了！'),
+    newPassword: zod.string().min(6, '至少需要六位密码哦！').max(15, '密码长度太长了！'),
+    userName: zod.string().min(1, '请输入姓名'),
+    role: zod.string().min(1, '请输入角色'),
+  })
+  .refine(FormData => FormData.password === FormData.newPassword, {
+    path: ['newPassword'],
+    message: '两次的密码不一致哦！',
+  });
 
 const Register = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
+    resolver: zodResolver(userInfo),
+  });
 
-    const {
-        handleSubmit,
-        register,
-        formState: {errors, isSubmitting},
-    } = useForm()
-
-   const onSubmit = (values) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                alert(JSON.stringify(values, null, 2))
-                resolve()
-            }, 3000)
+  const onSubmit = async (data: FormData) => {
+    try {
+      const json = await ky
+        .post(api + 'User/register', {
+          json: {
+            userName: data.userName,
+            password: data.password,
+            userId: data.userId,
+            code: '111111',
+            role: data.role,
+          },
         })
+        .json();
+      console.log(data);
+      // mutate(data1)
+      console.log(json);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
+  return (
+    <Center>
+      <Card h={600} w={400} mt={16}>
+        <CardHeader textAlign="center">
+          <Heading size="md">TalkSpace注册</Heading>
+        </CardHeader>
+        <CardBody>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <VStack spacing={8}>
+              <FormControl>
+                <Input {...register('userId')} type="userId" placeholder="请输入Email" />
+                <Text fontSize="xs" color="tomato">
+                  {errors.userId?.message}
+                </Text>
+              </FormControl>
+              <FormControl>
+                <Input {...register('password')} type="password" placeholder="请输入密码" />
+                <Text fontSize="xs" color="tomato">
+                  {errors.password?.message}
+                </Text>
+              </FormControl>
+              <FormControl>
+                <Input {...register('newPassword')} type="password" placeholder="请重复输入密码" />
+                <Text fontSize="xs" color="tomato">
+                  {errors.newPassword?.message}
+                </Text>
+              </FormControl>
+              <FormControl>
+                <HStack spacing={12}>
+                  <Box>
+                    <Input {...register('userName')} w={40} placeholder="请输入姓名" />
+                    <Text fontSize="xs" color="tomato">
+                      {errors.userName?.message}
+                    </Text>
+                  </Box>
+                  <Box>
+                    <Input {...register('role')} w={40} placeholder="请输入你的角色" />
+                    <Text fontSize="xs" color="tomato">
+                      {errors.role?.message}
+                    </Text>
+                  </Box>
+                </HStack>
+              </FormControl>
+              <FormControl textAlign="center" mt={24} colorScheme="teal">
+                <Button type="submit" colorScheme="teal" isLoading={isSubmitting}>
+                  注册
+                </Button>
+              </FormControl>
+            </VStack>
+          </form>
+        </CardBody>
+        <CardFooter>
+          <HStack spacing={60}>
+            <Link color="teal.500" href={`/login`}>
+              登录
+            </Link>
+            <Link color="teal.500" href={`/forget-password`}>
+              忘记密码？
+            </Link>
+          </HStack>
+        </CardFooter>
+      </Card>
+    </Center>
+  );
+};
 
-    return (
-        <Center>
-            <Card h={500} w={400} mt={36} textAlign='center'>
-                <CardHeader>
-                    <Heading size='md'>TalkSpace注册</Heading>
-                </CardHeader>
-                <CardBody>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <FormControl isInvalid={errors.email}>
-                            <FormLabel htmlFor='email'>email</FormLabel>
-                            <Input
-                                id='email'
-                                placeholder='email'
-                                type='email'
-                                {...register('email', {
-                                    required: '请输入正确的Email',
-                                    minLength: {value: 4, message: 'Email'},
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.email && errors.email.message}
-                            </FormErrorMessage>
-                        </FormControl>
-                        <FormControl isInvalid={errors.password}>
-                            <FormLabel htmlFor='password'>password</FormLabel>
-                            <Input
-                                id='password'
-                                placeholder='password'
-                                type='password'
-                                {...register('password', {
-                                    required: '请输入密码',
-                                    minLength: {value: 6, message: '密码需要输入6位'},
-                                })}
-                            />
-                            <FormErrorMessage>
-                                {errors.password && errors.password.message}
-                            </FormErrorMessage>
-                        </FormControl>
-                        <FormControl isInvalid={errors.newPassword}>
-                            <FormLabel htmlFor='newPassword'>newPassword</FormLabel>
-                            <Input
-                                id='newPassword'
-                                placeholder='newPassword'
-                                type='password'
-                                {...register('newPassword', {
-                                    required: '请确认密码',
-                                    minLength: {value: 6, message: '密码需要输入6位'},
-                                })}
-                            />
-                
-                            {/* <FormErrorMessage>
-                                {errors.password && errors.password.message}
-                            </FormErrorMessage> */}
-                        </FormControl>
-                        <Button mt={4} colorScheme='teal' isLoading={isSubmitting} type='submit' marginTop={12}>
-                            Submit
-                        </Button>
-                    </form>
-                </CardBody>
-                <CardFooter>
-                    <HStack spacing={30}>
-                        <Link>登录</Link>
-                        <Link>忘记密码？</Link>
-                    </HStack>
-                </CardFooter>
-            </Card>
-        </Center>
-    )
-}
-
-export default Register
+export default Register;
