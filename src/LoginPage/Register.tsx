@@ -7,15 +7,15 @@ import {
     Card,
     CardBody, CardFooter,
     CardHeader,
-    Center,
+    Center, chakra,
     FormControl,
     Heading, HStack,
     Input,
     Text, VStack
 } from "@chakra-ui/react";
-// import api from "../API/API";
-// import ky from "ky";
 import {Link, useNavigate} from "react-router-dom";
+import ky from "ky";
+import api from "../API/API";
 
 interface FormData {
     userId: string,
@@ -25,6 +25,8 @@ interface FormData {
     userName: string,
     role: string,
 }
+
+const ReLink = chakra(Link)
 
 const userInfo = zod.object({
     userId: zod.string().email({message: '请填入email'}),
@@ -46,22 +48,22 @@ const Register = () => {
 
 
     const onSubmit = async (data: FormData) => {
-        // try {
-        //     const json = await ky.post(api + "User/register", {
-        //         json: {
-        //             userName: data.userName,
-        //             password: data.password,
-        //             userId: data.userId,
-        //             code: '111111',
-        //             role: data.role,
-        //         }
-        //     }).json();
-        //     console.log(data)
-        //     // mutate(data1)
-        //     console.log(json)
-        // } catch (error) {
-        //     console.error(error);
-        // }
+        try {
+            const json = await ky.post(api + "User/register", {
+                json: {
+                    userName: data.userName,
+                    password: data.password,
+                    userId: data.userId,
+                    code: '111111',
+                    role: data.role,
+                }
+            }).json();
+            console.log(data)
+            // mutate(data1)
+            console.log(json)
+        } catch (error) {
+            console.error(error);
+        }
         navigate('/')
         console.log(data)
     }
@@ -99,20 +101,16 @@ const Register = () => {
                                     </Box>
                                 </HStack>
                             </FormControl>
-                            <FormControl textAlign="center" mt={24} colorScheme='teal'>
-                                <Button type="submit" colorScheme='teal' isLoading={isSubmitting}>注册</Button>
-                            </FormControl>
+                            <Center>
+                                <Button w={360} mt={8} type="submit" colorScheme='teal' isLoading={isSubmitting}>注册</Button>
+                            </Center>
                         </VStack>
                     </form>
                 </CardBody>
                 <CardFooter>
-                    <HStack spacing={60}>
-                        <Text color='teal.500'>
-                            <Link to='/'>登录</Link>
-                        </Text>
-                        <Text color='teal.500'>
-                            <Link to='/forgetPassword'>忘记密码？</Link>
-                        </Text>
+                    <HStack w="100%" justify="space-between">
+                        <ReLink color='teal.500' to='/'>登录</ReLink>
+                        <ReLink color='teal.500' to='/forgetPassword'>忘记密码？</ReLink>
                     </HStack>
                 </CardFooter>
             </Card>

@@ -6,13 +6,15 @@ import {
     Card,
     CardBody, CardFooter,
     CardHeader,
-    Center,
+    Center, chakra,
     FormControl,
     Heading, HStack,
     Input,
     Text, VStack
 } from "@chakra-ui/react";
 import {Link, useNavigate} from "react-router-dom";
+import ky from "ky";
+import api from "../API/API";
 
 interface FormData {
     userId: string,
@@ -20,6 +22,8 @@ interface FormData {
     newPassword: string,
     code: string
 }
+
+const ReLink = chakra(Link)
 
 const userInfo = zod.object({
     userId: zod.string().email({message: '请填入email'}),
@@ -37,26 +41,18 @@ const ForgetPassword = () => {
         resolver: zodResolver(userInfo)
     });
 
-    const onSubmit = (data: FormData) => {
-        // const json = ky.get(api + 'User/register',
-        //     {
-        //         json: {
-        //             userId: data.userId,
-        //             code: '1111',
-        //             newPassword: data.newPassword
-        //         },
-        //     }).json();
-        //
-        // console.log(json)
-
+    const onSubmit = async (data: FormData) => {
+        const json = ky.get(api + 'User/register',
+            {
+                json: {
+                    userId: data.userId,
+                    code: '1111',
+                    newPassword: data.newPassword
+                },
+            }).json();
+        console.log(json)
         navigate('/')
         console.log(data)
-
-        return new Promise<void>((resolve) => {
-            setTimeout(() => {
-                resolve()
-            }, 3000)
-        })
     }
 
 
@@ -81,20 +77,16 @@ const ForgetPassword = () => {
                                 <Input {...register("newPassword")} type="password" placeholder="请重复输入密码"/>
                                 <Text fontSize="xs" color="tomato">{errors.newPassword?.message}</Text>
                             </FormControl>
-                            <FormControl textAlign="center" mt={12} colorScheme='teal'>
-                                <Button type="submit" colorScheme='teal'>找回密码</Button>
-                            </FormControl>
+                            <Center>
+                                <Button mt={12} w={360} type="submit" colorScheme='teal'>找回密码</Button>
+                            </Center>
                         </VStack>
                     </form>
                 </CardBody>
                 <CardFooter>
-                    <HStack spacing={72}>
-                        <Text color='teal.500'>
-                            <Link to='/'>登录</Link>
-                        </Text>
-                        <Text color='teal.500'>
-                            <Link to='/register'>注册</Link>
-                        </Text>
+                    <HStack w="100%" justify="space-between">
+                            <ReLink color='teal.500' to='/'>登录</ReLink>
+                            <ReLink color='teal.500' to='/register'>注册</ReLink>
                     </HStack>
                 </CardFooter>
             </Card>

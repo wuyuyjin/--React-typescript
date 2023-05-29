@@ -6,28 +6,36 @@ import {
     CardHeader,
     Center,
     FormControl,
-    HStack,
     Heading,
+    HStack,
     Input,
-    Text,
+    Text, chakra,
     VStack,
 } from '@chakra-ui/react';
 import {zodResolver} from '@hookform/resolvers/zod';
-import ky from 'ky';
+// import ky from 'ky';
 import {useForm} from 'react-hook-form';
 import * as zod from 'zod';
+import {Link, useNavigate} from "react-router-dom";
 import api from "../API/API";
-import {Link} from "react-router-dom";
+import ky from "ky";
 
 interface IFormInputs {
     userId: string;
     password: string;
 }
 
+const ReLink = chakra(Link)
+
 const userInfo = zod.object({
     userId: zod.string().email({message: '请输入email'}),
     password: zod.string().min(6, '密码需要输入6位').max(15, '密码最长15位'),
 });
+
+const fetcher = async (url: string, data: IFormInputs) => {
+    const response = await ky.post(url, {json: data});
+    return response.json();
+};
 
 const Login = () => {
     const {
@@ -38,16 +46,18 @@ const Login = () => {
         resolver: zodResolver(userInfo),
     });
 
+    const navigate = useNavigate()
+
     const onSubmit = async (data: IFormInputs) => {
-        const json = await ky
-            .post(api + 'User/login', {
-                json: {
-                    password: data.password,
-                    userId: data.userId,
-                },
-            })
-            .json();
-        console.log(json);
+        try {
+            const response = await fetcher(
+                api + 'User/login', data
+            );
+            console.log('API response:', response);
+        } catch (error) {
+            console.log('An error occurred:', error);
+        }
+        navigate('/home')
     };
 
     return (
@@ -76,7 +86,7 @@ const Login = () => {
                                 </Text>
                             </FormControl>
                             <Center>
-                                <Button mt={12} colorScheme="teal" type="submit">
+                                <Button mt={12} w={360} colorScheme="teal" type="submit">
                                     登录
                                 </Button>
                             </Center>
@@ -84,13 +94,9 @@ const Login = () => {
                     </form>
                 </CardBody>
                 <CardFooter>
-                    <HStack spacing={60}>
-                        <Text color='teal.500'>
-                            <Link to="/register">注册</Link>
-                        </Text>
-                        <Text color='teal.500'>
-                            <Link to="/forgetPassword">忘记密码？</Link>
-                        </Text>
+                    <HStack w="100%" justify="space-between">
+                        <ReLink color='teal.500' to="/register">注册</ReLink>
+                        <ReLink color='teal.500' to="/forgetPassword">忘记密码？</ReLink>
                     </HStack>
                 </CardFooter>
             </Card>

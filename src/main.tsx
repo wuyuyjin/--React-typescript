@@ -7,6 +7,7 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider} f
 import Login from "./LoginPage/Login";
 import Register from "./LoginPage/Register";
 import ForgetPassword from "./LoginPage/ForgetPassword";
+import Home from "./HomePage/Home";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -14,6 +15,7 @@ const router = createBrowserRouter(
             <Route index element={<Login/>}/>
             <Route path="register" element={<Register/>}/>
             <Route path="forgetPassword" element={<ForgetPassword/>}/>
+            <Route path="home" element={<Home />} />
         </Route>
     )
 )
